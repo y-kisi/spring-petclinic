@@ -1,7 +1,9 @@
 package org.springframework.samples.petclinic.owner;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.springframework.samples.petclinic.owner.PetRepository;
 import org.springframework.samples.petclinic.vet.Vet;
 import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.stereotype.Controller;
@@ -17,17 +19,20 @@ import jakarta.validation.Valid;
 class HospitalReservationController {
 
 	private final HospitalReservationRepository reservations;
+
 	private final PetRepository pets;
+
 	private final VetRepository vets;
 
-	public HospitalReservationController(HospitalReservationRepository reservations, PetRepository pets, VetRepository vets) {
+	public HospitalReservationController(HospitalReservationRepository reservations, PetRepository pets,
+			VetRepository vets) {
 		this.reservations = reservations;
 		this.pets = pets;
 		this.vets = vets;
 	}
 
 	@ModelAttribute("vets")
-	public List<Vet> populateVets() {
+	public Collection<Vet> populateVets() {
 		return this.vets.findAll();
 	}
 
@@ -39,7 +44,7 @@ class HospitalReservationController {
 
 	@GetMapping("/owners/{ownerId}/pets/{petId}/reservations/hospital/new")
 	public String initCreationForm(@PathVariable("petId") int petId, Map<String, Object> model) {
-		Pet pet = this.pets.findById(petId);
+		Pet pet = this.pets.findById(petId).orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId));
 		HospitalReservation reservation = new HospitalReservation();
 		reservation.setPet(pet);
 		model.put("hospitalReservation", reservation);
@@ -50,7 +55,8 @@ class HospitalReservationController {
 	public String processCreationForm(@Valid @ModelAttribute("hospitalReservation") HospitalReservation reservation,
 			BindingResult result, @PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId, Model model) {
 		if (result.hasErrors()) {
-			Pet pet = this.pets.findById(petId);
+			Pet pet = this.pets.findById(petId)
+				.orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId));
 			reservation.setPet(pet);
 			model.addAttribute("hospitalReservation", reservation);
 			return "reservations/createOrUpdateHospitalReservationForm";
@@ -61,7 +67,8 @@ class HospitalReservationController {
 
 	@GetMapping("/reservations/hospital/{reservationId}/edit")
 	public String initUpdateForm(@PathVariable("reservationId") int reservationId, Model model) {
-		HospitalReservation reservation = this.reservations.findById(reservationId).orElseThrow(() -> new IllegalArgumentException("Invalid reservation Id:" + reservationId));
+		HospitalReservation reservation = this.reservations.findById(reservationId)
+			.orElseThrow(() -> new IllegalArgumentException("Invalid reservation Id:" + reservationId));
 		model.addAttribute("hospitalReservation", reservation);
 		return "reservations/createOrUpdateHospitalReservationForm";
 	}
@@ -76,4 +83,5 @@ class HospitalReservationController {
 		this.reservations.save(reservation);
 		return "redirect:/reservations/hospital";
 	}
+
 }

@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.util.Map;
+import org.springframework.samples.petclinic.owner.PetRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +15,7 @@ import jakarta.validation.Valid;
 class TrimmingAppointmentController {
 
 	private final TrimmingAppointmentRepository appointments;
+
 	private final PetRepository pets;
 
 	public TrimmingAppointmentController(TrimmingAppointmentRepository appointments, PetRepository pets) {
@@ -29,7 +31,8 @@ class TrimmingAppointmentController {
 
 	@GetMapping("/owners/{ownerId}/pets/{petId}/reservations/trimming/new")
 	public String initCreationForm(@PathVariable("petId") int petId, Map<String, Object> model) {
-		Pet pet = this.pets.findById(petId);
+		Pet pet = this.pets.findById(petId).orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId)); // ★
+																														// 修正
 		TrimmingAppointment appointment = new TrimmingAppointment();
 		appointment.setPet(pet);
 		model.put("trimmingAppointment", appointment);
@@ -40,7 +43,8 @@ class TrimmingAppointmentController {
 	public String processCreationForm(@Valid @ModelAttribute("trimmingAppointment") TrimmingAppointment appointment,
 			BindingResult result, @PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId, Model model) {
 		if (result.hasErrors()) {
-			Pet pet = this.pets.findById(petId);
+			Pet pet = this.pets.findById(petId)
+				.orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId));
 			appointment.setPet(pet);
 			model.addAttribute("trimmingAppointment", appointment);
 			return "reservations/createOrUpdateTrimmingAppointmentForm";
@@ -51,7 +55,8 @@ class TrimmingAppointmentController {
 
 	@GetMapping("/reservations/trimming/{appointmentId}/edit")
 	public String initUpdateForm(@PathVariable("appointmentId") int appointmentId, Model model) {
-		TrimmingAppointment appointment = this.appointments.findById(appointmentId).orElseThrow(() -> new IllegalArgumentException("Invalid appointment Id:" + appointmentId));
+		TrimmingAppointment appointment = this.appointments.findById(appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("Invalid appointment Id:" + appointmentId));
 		model.addAttribute("trimmingAppointment", appointment);
 		return "reservations/createOrUpdateTrimmingAppointmentForm";
 	}
@@ -66,4 +71,5 @@ class TrimmingAppointmentController {
 		this.appointments.save(appointment);
 		return "redirect:/reservations/trimming";
 	}
+
 }

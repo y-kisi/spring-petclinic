@@ -16,7 +16,9 @@ import jakarta.validation.Valid;
 class BillingController {
 
 	private final BillingRepository billings;
+
 	private final HotelStayRepository stays;
+
 	private static final BigDecimal DAILY_RATE = new BigDecimal("5000"); // 1泊あたりの料金
 
 	public BillingController(BillingRepository billings, HotelStayRepository stays) {
@@ -26,7 +28,8 @@ class BillingController {
 
 	@GetMapping("/stays/{stayId}/billing")
 	public String showBillingForm(@PathVariable("stayId") int stayId, Model model) {
-		HotelStay stay = this.stays.findById(stayId).orElseThrow(() -> new IllegalArgumentException("Invalid stay Id:" + stayId));
+		HotelStay stay = this.stays.findById(stayId)
+			.orElseThrow(() -> new IllegalArgumentException("Invalid stay Id:" + stayId));
 		Billing billing = new Billing();
 		billing.setStay(stay);
 
@@ -41,7 +44,8 @@ class BillingController {
 	}
 
 	@PostMapping("/stays/{stayId}/billing")
-	public String processBilling(@Valid @ModelAttribute("billing") Billing billing, BindingResult result, @PathVariable("stayId") int stayId) {
+	public String processBilling(@Valid @ModelAttribute("billing") Billing billing, BindingResult result,
+			@PathVariable("stayId") int stayId) {
 		if (result.hasErrors()) {
 			return "reservations/billingForm";
 		}
@@ -49,4 +53,5 @@ class BillingController {
 		this.billings.save(billing);
 		return "redirect:/reservations/hotel";
 	}
+
 }

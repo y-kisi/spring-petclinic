@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.util.Map;
+import org.springframework.samples.petclinic.owner.PetRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +15,7 @@ import jakarta.validation.Valid;
 class HotelStayController {
 
 	private final HotelStayRepository stays;
+
 	private final PetRepository pets;
 
 	public HotelStayController(HotelStayRepository stays, PetRepository pets) {
@@ -29,7 +31,8 @@ class HotelStayController {
 
 	@GetMapping("/owners/{ownerId}/pets/{petId}/reservations/hotel/new")
 	public String initCreationForm(@PathVariable("petId") int petId, Map<String, Object> model) {
-		Pet pet = this.pets.findById(petId);
+		Pet pet = this.pets.findById(petId).orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId)); // ★
+																														// 修正
 		HotelStay stay = new HotelStay();
 		stay.setPet(pet);
 		model.put("hotelStay", stay);
@@ -40,7 +43,8 @@ class HotelStayController {
 	public String processCreationForm(@Valid @ModelAttribute("hotelStay") HotelStay stay, BindingResult result,
 			@PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId, Model model) {
 		if (result.hasErrors()) {
-			Pet pet = this.pets.findById(petId);
+			Pet pet = this.pets.findById(petId)
+				.orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId));
 			stay.setPet(pet);
 			model.addAttribute("hotelStay", stay);
 			return "reservations/createOrUpdateHotelStayForm";
@@ -51,7 +55,8 @@ class HotelStayController {
 
 	@GetMapping("/reservations/hotel/{stayId}/edit")
 	public String initUpdateForm(@PathVariable("stayId") int stayId, Model model) {
-		HotelStay stay = this.stays.findById(stayId).orElseThrow(() -> new IllegalArgumentException("Invalid stay Id:" + stayId));
+		HotelStay stay = this.stays.findById(stayId)
+			.orElseThrow(() -> new IllegalArgumentException("Invalid stay Id:" + stayId));
 		model.addAttribute("hotelStay", stay);
 		return "reservations/createOrUpdateHotelStayForm";
 	}
@@ -66,4 +71,5 @@ class HotelStayController {
 		this.stays.save(stay);
 		return "redirect:/reservations/hotel";
 	}
+
 }
