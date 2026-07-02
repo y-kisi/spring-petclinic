@@ -65,6 +65,9 @@ class VisitController {
 		Owner owner = EntityLookupUtil.findByIdOrThrow(this.owners, ownerId, "Owner");
 
 		Pet pet = owner.getPet(petId);
+		if (pet == null) {
+			throw new IllegalArgumentException("Pet not found with id: " + petId + " for owner " + ownerId + ".");
+		}
 		model.put("pet", pet);
 		model.put("owner", owner);
 

@@ -47,9 +47,12 @@ class BillingController {
 	public String processBilling(@Valid @ModelAttribute("billing") Billing billing, BindingResult result,
 			@PathVariable("stayId") int stayId) {
 		if (result.hasErrors()) {
+			HotelStay stay = this.stays.findById(stayId)
+				.orElseThrow(() -> new IllegalArgumentException("Invalid stay Id:" + stayId));
+			billing.setStay(stay);
 			return "reservations/billingForm";
 		}
-		billing.setPaymentDate(LocalDate.now()); // 本日日付で支払い完了とする
+		billing.setPaymentDate(LocalDate.now());
 		this.billings.save(billing);
 		return "redirect:/reservations/hotel";
 	}
