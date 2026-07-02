@@ -8,7 +8,7 @@ import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "trimming_appointments")
-public class TrimmingAppointment extends BaseEntity {
+public class TrimmingAppointment extends BaseEntity implements PetLinkedEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "pet_id")
@@ -22,10 +22,12 @@ public class TrimmingAppointment extends BaseEntity {
 
 	@Column(name = "course")
 	@NotEmpty
+	@Size(max = 100)
 	private String course;
 
 	@Column(name = "trimmer_name")
 	@NotEmpty
+	@Size(max = 100)
 	private String trimmerName;
 
 	public Pet getPet() {

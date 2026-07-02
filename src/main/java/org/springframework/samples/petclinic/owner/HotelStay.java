@@ -8,7 +8,7 @@ import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "hotel_stays")
-public class HotelStay extends BaseEntity {
+public class HotelStay extends BaseEntity implements PetLinkedEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "pet_id")
@@ -27,6 +27,7 @@ public class HotelStay extends BaseEntity {
 
 	@Column(name = "room_number")
 	@NotEmpty
+	@Size(max = 20)
 	private String roomNumber;
 
 	@OneToOne(mappedBy = "stay", cascade = CascadeType.ALL)

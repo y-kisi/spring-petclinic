@@ -11,7 +11,7 @@ import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "hospital_reservations")
-public class HospitalReservation extends BaseEntity {
+public class HospitalReservation extends BaseEntity implements PetLinkedEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "pet_id")
@@ -30,6 +30,7 @@ public class HospitalReservation extends BaseEntity {
 
 	@Column(name = "description")
 	@NotEmpty
+	@Size(max = 500)
 	private String description;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "reservation", fetch = FetchType.EAGER)

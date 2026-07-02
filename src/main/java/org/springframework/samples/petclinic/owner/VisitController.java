@@ -16,8 +16,8 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.util.Map;
-import java.util.Optional;
 
+import org.springframework.samples.petclinic.util.EntityLookupUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -62,9 +62,7 @@ class VisitController {
 	@ModelAttribute("visit")
 	public Visit loadPetWithVisit(@PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId,
 			Map<String, Object> model) {
-		Optional<Owner> optionalOwner = owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+		Owner owner = EntityLookupUtil.findByIdOrThrow(this.owners, ownerId, "Owner");
 
 		Pet pet = owner.getPet(petId);
 		if (pet == null) {

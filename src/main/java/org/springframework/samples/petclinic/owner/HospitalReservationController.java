@@ -1,9 +1,8 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import org.springframework.samples.petclinic.owner.PetRepository;
+import org.springframework.samples.petclinic.util.EntityLookupUtil;
 import org.springframework.samples.petclinic.vet.Vet;
 import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.stereotype.Controller;
@@ -44,7 +43,7 @@ class HospitalReservationController {
 
 	@GetMapping("/owners/{ownerId}/pets/{petId}/reservations/hospital/new")
 	public String initCreationForm(@PathVariable("petId") int petId, Map<String, Object> model) {
-		Pet pet = this.pets.findById(petId).orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId));
+		Pet pet = EntityLookupUtil.findByIdOrThrow(this.pets, petId, "Pet");
 		HospitalReservation reservation = new HospitalReservation();
 		reservation.setPet(pet);
 		model.put("hospitalReservation", reservation);
@@ -55,8 +54,7 @@ class HospitalReservationController {
 	public String processCreationForm(@Valid @ModelAttribute("hospitalReservation") HospitalReservation reservation,
 			BindingResult result, @PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId, Model model) {
 		if (result.hasErrors()) {
-			Pet pet = this.pets.findById(petId)
-				.orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId));
+			Pet pet = EntityLookupUtil.findByIdOrThrow(this.pets, petId, "Pet");
 			reservation.setPet(pet);
 			model.addAttribute("hospitalReservation", reservation);
 			return "reservations/createOrUpdateHospitalReservationForm";
@@ -67,8 +65,8 @@ class HospitalReservationController {
 
 	@GetMapping("/reservations/hospital/{reservationId}/edit")
 	public String initUpdateForm(@PathVariable("reservationId") int reservationId, Model model) {
-		HospitalReservation reservation = this.reservations.findById(reservationId)
-			.orElseThrow(() -> new IllegalArgumentException("Invalid reservation Id:" + reservationId));
+		HospitalReservation reservation = EntityLookupUtil.findByIdOrThrow(this.reservations, reservationId,
+				"Reservation");
 		model.addAttribute("hospitalReservation", reservation);
 		return "reservations/createOrUpdateHospitalReservationForm";
 	}
