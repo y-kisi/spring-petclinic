@@ -30,6 +30,7 @@ public class HospitalReservation extends BaseEntity implements PetLinkedEntity {
 
 	@Column(name = "description")
 	@NotEmpty
+	@Size(max = 500)
 	private String description;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "reservation", fetch = FetchType.EAGER)

@@ -15,6 +15,7 @@ public class Prescription extends BaseEntity {
 
 	@Column(name = "medicine_name")
 	@NotEmpty
+	@Size(max = 200)
 	private String medicineName;
 
 	@Column(name = "quantity")
