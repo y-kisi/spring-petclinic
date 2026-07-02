@@ -3,6 +3,7 @@ package org.springframework.samples.petclinic.owner;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import org.springframework.samples.petclinic.util.EntityLookupUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,8 +29,7 @@ class BillingController {
 
 	@GetMapping("/stays/{stayId}/billing")
 	public String showBillingForm(@PathVariable("stayId") int stayId, Model model) {
-		HotelStay stay = this.stays.findById(stayId)
-			.orElseThrow(() -> new IllegalArgumentException("Invalid stay Id:" + stayId));
+		HotelStay stay = EntityLookupUtil.findByIdOrThrow(this.stays, stayId, "Stay");
 		Billing billing = new Billing();
 		billing.setStay(stay);
 
