@@ -22,10 +22,12 @@ public class TrimmingAppointment extends BaseEntity {
 
 	@Column(name = "course")
 	@NotEmpty
+	@Size(max = 100)
 	private String course;
 
 	@Column(name = "trimmer_name")
 	@NotEmpty
+	@Size(max = 100)
 	private String trimmerName;
 
 	public Pet getPet() {

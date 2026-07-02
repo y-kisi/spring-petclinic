@@ -27,6 +27,7 @@ public class HotelStay extends BaseEntity {
 
 	@Column(name = "room_number")
 	@NotEmpty
+	@Size(max = 20)
 	private String roomNumber;
 
 	@OneToOne(mappedBy = "stay", cascade = CascadeType.ALL)
