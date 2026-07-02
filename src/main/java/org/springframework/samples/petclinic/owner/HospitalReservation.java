@@ -11,7 +11,7 @@ import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "hospital_reservations")
-public class HospitalReservation extends BaseEntity {
+public class HospitalReservation extends BaseEntity implements PetLinkedEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "pet_id")

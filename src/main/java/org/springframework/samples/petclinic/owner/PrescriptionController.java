@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.util.Map;
+import org.springframework.samples.petclinic.util.EntityLookupUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,16 +25,16 @@ class PrescriptionController {
 
 	@GetMapping("/reservations/hospital/{reservationId}/prescriptions")
 	public String showPrescriptionList(@PathVariable("reservationId") int reservationId, Map<String, Object> model) {
-		HospitalReservation reservation = this.reservations.findById(reservationId)
-			.orElseThrow(() -> new IllegalArgumentException("Invalid reservation Id:" + reservationId));
+		HospitalReservation reservation = EntityLookupUtil.findByIdOrThrow(this.reservations, reservationId,
+				"Reservation");
 		model.put("reservation", reservation);
 		return "reservations/prescriptionList";
 	}
 
 	@GetMapping("/reservations/hospital/{reservationId}/prescriptions/new")
 	public String initCreationForm(@PathVariable("reservationId") int reservationId, Map<String, Object> model) {
-		HospitalReservation reservation = this.reservations.findById(reservationId)
-			.orElseThrow(() -> new IllegalArgumentException("Invalid reservation Id:" + reservationId));
+		HospitalReservation reservation = EntityLookupUtil.findByIdOrThrow(this.reservations, reservationId,
+				"Reservation");
 		Prescription prescription = new Prescription();
 		prescription.setReservation(reservation);
 		model.put("prescription", prescription);
@@ -44,8 +45,8 @@ class PrescriptionController {
 	public String processCreationForm(@Valid @ModelAttribute("prescription") Prescription prescription,
 			BindingResult result, @PathVariable("reservationId") int reservationId, Model model) {
 		if (result.hasErrors()) {
-			HospitalReservation reservation = this.reservations.findById(reservationId)
-				.orElseThrow(() -> new IllegalArgumentException("Invalid reservation Id:" + reservationId));
+			HospitalReservation reservation = EntityLookupUtil.findByIdOrThrow(this.reservations, reservationId,
+					"Reservation");
 			prescription.setReservation(reservation);
 			model.addAttribute("prescription", prescription);
 			return "reservations/createOrUpdatePrescriptionForm";

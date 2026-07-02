@@ -1,7 +1,7 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.util.Map;
-import org.springframework.samples.petclinic.owner.PetRepository;
+import org.springframework.samples.petclinic.util.EntityLookupUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,8 +31,7 @@ class TrimmingAppointmentController {
 
 	@GetMapping("/owners/{ownerId}/pets/{petId}/reservations/trimming/new")
 	public String initCreationForm(@PathVariable("petId") int petId, Map<String, Object> model) {
-		Pet pet = this.pets.findById(petId).orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId)); // ★
-																														// 修正
+		Pet pet = EntityLookupUtil.findByIdOrThrow(this.pets, petId, "Pet");
 		TrimmingAppointment appointment = new TrimmingAppointment();
 		appointment.setPet(pet);
 		model.put("trimmingAppointment", appointment);
@@ -43,8 +42,7 @@ class TrimmingAppointmentController {
 	public String processCreationForm(@Valid @ModelAttribute("trimmingAppointment") TrimmingAppointment appointment,
 			BindingResult result, @PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId, Model model) {
 		if (result.hasErrors()) {
-			Pet pet = this.pets.findById(petId)
-				.orElseThrow(() -> new IllegalArgumentException("Invalid pet Id:" + petId));
+			Pet pet = EntityLookupUtil.findByIdOrThrow(this.pets, petId, "Pet");
 			appointment.setPet(pet);
 			model.addAttribute("trimmingAppointment", appointment);
 			return "reservations/createOrUpdateTrimmingAppointmentForm";
@@ -55,8 +53,8 @@ class TrimmingAppointmentController {
 
 	@GetMapping("/reservations/trimming/{appointmentId}/edit")
 	public String initUpdateForm(@PathVariable("appointmentId") int appointmentId, Model model) {
-		TrimmingAppointment appointment = this.appointments.findById(appointmentId)
-			.orElseThrow(() -> new IllegalArgumentException("Invalid appointment Id:" + appointmentId));
+		TrimmingAppointment appointment = EntityLookupUtil.findByIdOrThrow(this.appointments, appointmentId,
+				"Appointment");
 		model.addAttribute("trimmingAppointment", appointment);
 		return "reservations/createOrUpdateTrimmingAppointmentForm";
 	}
